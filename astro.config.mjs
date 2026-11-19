@@ -26,8 +26,8 @@ import { pluginCustomCopyButton } from "./src/plugins/expressive-code/custom-cop
 
 // https://astro.build/config
 export default defineConfig({
-	// Set SITE_URL to the actual workers.dev URL or custom domain before deployment.
-	site: process.env.SITE_URL || "http://localhost:4321/",
+	// Override SITE_URL when switching to a custom domain or another deployment.
+	site: process.env.SITE_URL || "https://blog-web-hsy.hshu96260.workers.dev/",
 	output: "static",
 	base: "/",
 	trailingSlash: "always",

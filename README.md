@@ -1,6 +1,12 @@
 # SunnyHuang 的博客
 
-基于 Astro 和 Fuwari 的个人博客，文章以 Markdown 管理，计划部署到 Cloudflare Workers。
+SunnyHuang 的个人博客，分享技术实践、学习笔记与生活思考。网站基于 Astro 和 Fuwari，文章以 Markdown 管理，已部署到 Cloudflare Workers。
+
+- 访问线上网站。[SunnyHuang 的博客](https://blog-web-hsy.hshu96260.workers.dev/)
+- 阅读第一篇技术分享。[使用 Astro、Fuwari 和 Cloudflare 发布我的个人博客](https://blog-web-hsy.hshu96260.workers.dev/posts/astro-fuwari-cloudflare-blog/)
+- 查看文章源码。[博客搭建记录](src/content/posts/astro-fuwari-cloudflare-blog.md)
+
+推送到 `main` 分支会触发 Cloudflare Workers Builds，依次构建静态页面、生成 Pagefind 搜索索引并部署。
 
 ## 本地开发
 
@@ -26,9 +32,11 @@ corepack pnpm preview
 - `src/config.ts` 保存站点名称、语言、个人介绍、导航和社交链接。
 - `src/content/spec/about.md` 保存关于页面。
 - `public/avatar.jpg` 是微信头像，同时用作 favicon。
-- `src/content/posts/` 保存文章，当前欢迎文章是可修改的初始文案。
+- `src/content/posts/` 保存文章，包含欢迎文章和博客搭建技术分享。
 
 显示名使用英文名 SunnyHuang，简介和文章内容可以按自己的情况修改。文章授权提示已关闭，确定自己的文章授权方式后可在 `licenseConfig` 中设置。
+
+页面布局由 `src/layouts/MainGridLayout.astro` 管理，侧边栏组件位于 `src/components/widget/`，全局样式入口为 `src/styles/global.css`。顶部横幅和导航可在 `src/config.ts` 中配置。
 
 ## 写文章
 
@@ -53,28 +61,51 @@ draft: false
 
 `draft: true` 的文章只在开发模式显示，正式构建会排除草稿。文章使用 Markdown，代码块、数学公式、目录等能力沿用 Fuwari。
 
+图片可以放进 `public/images/`，在 Markdown 中使用 `/images/文件名.jpg` 引用。准备发布时将 `draft` 改为 `false`，执行检查和构建，再提交文章及其使用的图片。
+
+```powershell
+corepack pnpm check
+corepack pnpm build
+git status
+git add src/content/posts/
+git commit -m "docs: publish a new post"
+git push origin main
+```
+
+新增图片需额外 `git add` 对应的 `public/` 文件。可在 Cloudflare 的 Deployments 页面查看自动部署记录。
+
 ## 部署到 Cloudflare Workers
 
-1. 将本地代码提交并推送到 `https://github.com/Senanate/blog_web_Hsy` 的 `main` 分支。
-2. 注册 Cloudflare，在 Workers & Pages 中创建应用并连接此 GitHub 仓库。
-3. Worker 名称填写 `blog-web-hsy`，与 `wrangler.jsonc` 中的名称一致。
-4. 构建命令填写 `pnpm build`，部署命令填写 `pnpm exec wrangler deploy`，根目录使用仓库根目录，生产分支选择 `main`。
-5. 在构建环境变量中设置 `SITE_URL` 为 Cloudflare 实际提供的 HTTPS 地址，例如你的 `workers.dev` 地址，末尾加 `/`。Node.js 构建版本选择 24。
-6. 部署成功后检查首页、文章、归档、关于、搜索、RSS 与 404。推送新提交会触发后续部署。
+本站已经连接 GitHub 和 Cloudflare，当前部署参数如下。
 
-`SITE_URL` 决定 canonical、RSS、robots.txt 和 sitemap 的正式地址。本地缺省为 `http://localhost:4321/`，正式上线前必须设置为自己的实际网址。若首次部署后才得到网址，设置后重新构建部署。
+| 配置项 | 当前值 |
+| --- | --- |
+| GitHub 仓库 | `Senanate/blog_web_Hsy` |
+| 生产分支 | `main` |
+| Worker 名称 | `blog-web-hsy` |
+| Path／根目录 | `/` |
+| 构建命令 | `pnpm build` |
+| 部署命令 | `pnpm exec wrangler deploy` |
+| 构建变量 `NODE_VERSION` | `24` |
+| 构建变量 `SITE_URL` | `https://blog-web-hsy.hshu96260.workers.dev/` |
+
+首次搭建时，在 Workers & Pages 创建应用并连接 GitHub 仓库。Worker 名称与 `wrangler.jsonc` 的 `name` 对齐，构建变量在 Settings 的 Build／Builds 下配置。首次部署后进入 Domains 查看 Production 对应的 `workers.dev` 地址，并启用该行开关。
+
+复用此项目时，填写自己的 GitHub 仓库、Worker 名称与实际域名。修改构建变量后重新触发部署，检查首页、文章、关于、搜索、RSS、站点地图和 404。
+
+`SITE_URL` 决定 canonical、RSS、robots.txt 和 sitemap 的正式地址。`astro.config.mjs` 默认使用本站当前的公网地址，也支持通过构建环境变量覆盖。开发预览仍在本地地址打开，默认是 `http://localhost:4321/`。
 
 本机也可以先设置环境变量、登录 Cloudflare，再直接部署。
 
 ```powershell
-$env:SITE_URL = 'https://你的实际域名/'
+$env:SITE_URL = 'https://blog-web-hsy.hshu96260.workers.dev/'
 corepack pnpm exec wrangler login
 corepack pnpm deploy
 ```
 
 ## 自定义域名
 
-购买域名后，将域名接入 Cloudflare 并按提示修改注册商的 NS。激活后，在 Worker 的 Settings → Domains & Routes 中添加 Custom Domain，等待证书生效。将构建环境中的 `SITE_URL` 改为正式域名并重新部署。
+当前使用 Cloudflare 提供的 `workers.dev` 域名。以后购买自定义域名后，将域名接入 Cloudflare 并按提示修改注册商的 NS。激活后，在 Worker 的 Domains 页面添加自定义域名，等待证书生效。将构建环境中的 `SITE_URL` 改为正式域名并重新部署。
 
 ## 模板来源与许可
 

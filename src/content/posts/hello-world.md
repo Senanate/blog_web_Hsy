@@ -25,6 +25,8 @@ draft: false
 
 ## 关于这个小站
 
-博客基于 Astro 和 Fuwari 主题搭建，文章以 Markdown 保存，源代码托管于 GitHub。后续会接入 Cloudflare 和自己的域名。
+博客基于 Astro 和 Fuwari 主题搭建，文章以 Markdown 保存，源代码托管于 GitHub，目前已经通过 Cloudflare Workers 上线。
+
+我把从模板配置到自动部署的过程整理成了第一篇技术分享。[阅读博客搭建记录](/posts/astro-fuwari-cloudflare-blog/)
 
 期待在这里留下更多值得回看的内容。
