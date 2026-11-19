@@ -1,0 +1,13 @@
+---
+import MainGridLayout from "../layouts/MainGridLayout.astro";
+import { url } from "../utils/url-utils";
+---
+
+<MainGridLayout title="页面未找到" description="这个页面暂时找不到，回到首页看看最新文章吧。">
+    <section class="card-base px-8 py-16 text-center">
+        <p class="text-5xl font-bold text-[var(--primary)] mb-4">404</p>
+        <h1 class="text-2xl font-bold text-90 mb-4">这个页面暂时找不到</h1>
+        <p class="text-75 mb-8">链接可能已经变更，也许能在首页找到你想读的文章。</p>
+        <a class="btn-regular inline-flex min-h-11 items-center rounded-lg px-6" href={url("/")}>回到首页</a>
+    </section>
+</MainGridLayout>
