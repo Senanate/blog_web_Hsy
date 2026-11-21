@@ -1,0 +1,15 @@
+---
+import { Image } from "astro:assets";
+import cover from "../assets/albums/jiuzhaigou/misty-lake.jpg";
+import { url } from "../utils/url-utils";
+---
+
+<a href={url('/albums/#jiuzhaigou-1101')} class="album-preview card-base mb-4 grid sm:grid-cols-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--primary)]">
+    <div class="p-6 md:p-8 flex flex-col justify-center items-start">
+        <p class="text-sm font-medium text-[var(--primary)] mb-3">相册 · 11 月 1 日</p>
+        <h2 class="text-2xl font-bold text-90 mb-3">九寨沟之行</h2>
+        <p class="text-75 leading-relaxed mb-5">山间云雾、秋色与湖水，收进这次旅行的三张照片里。</p>
+        <span class="text-sm font-medium text-[var(--primary)]">查看相册 · 3 张照片</span>
+    </div>
+    <Image src={cover} alt="九寨沟秋日的湖水与山林倒影" widths={[480, 800]} sizes="(max-width: 639px) 100vw, 400px" format="webp" class="w-full h-full object-cover aspect-[4/3]" />
+</a>

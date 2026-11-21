@@ -1,0 +1,70 @@
+---
+import { Image } from "astro:assets";
+import autumnReflections from "../assets/albums/jiuzhaigou/autumn-reflections.jpg";
+import mistyLake from "../assets/albums/jiuzhaigou/misty-lake.jpg";
+import mountainsAndWater from "../assets/albums/jiuzhaigou/mountains-and-water.jpg";
+import MainGridLayout from "../layouts/MainGridLayout.astro";
+
+const photos = [
+	{
+		image: autumnReflections,
+		title: "秋色与倒影",
+		alt: "九寨沟碧绿的湖水、岸边黄叶与云雾中的山林",
+	},
+	{
+		image: mistyLake,
+		title: "云雾中的山林",
+		alt: "九寨沟山谷秋林在湖中的倒影，山间有低垂的云雾",
+	},
+	{
+		image: mountainsAndWater,
+		title: "湖畔的秋天",
+		alt: "枝叶下的九寨沟湖面与色彩斑斓的山坡",
+	},
+];
+---
+
+<MainGridLayout title="相册" description="SunnyHuang 的旅行相册，记录 11 月 1 日九寨沟之行的秋色、湖水与山林。">
+    <section id="jiuzhaigou-1101" class="card-base p-5 md:p-8" data-pagefind-body>
+        <header class="mb-7">
+            <p class="text-sm font-medium text-[var(--primary)] mb-3">相册 · 11 月 1 日 · 3 张照片</p>
+            <h1 class="text-3xl md:text-4xl font-bold text-90 mb-4" data-pagefind-meta="title">九寨沟之行</h1>
+            <p class="text-75 leading-relaxed">记录这一天的湖水、秋色与山间云雾。点击照片，可以查看大图。</p>
+        </header>
+        <div class="album-grid">
+            {photos.map((photo) => (
+                <figure class="album-photo">
+                    <a href={photo.image.src} data-no-swup data-album-photo data-pswp-width={photo.image.width} data-pswp-height={photo.image.height} aria-label={`查看大图，${photo.title}`} class="photo-link rounded-xl overflow-hidden block focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--primary)]">
+                        <Image src={photo.image} alt={photo.alt} widths={[480, 800, 1200]} sizes="(max-width: 639px) 100vw, 420px" format="webp" class="w-full h-full object-cover" />
+                    </a>
+                    <figcaption class="text-sm text-75 mt-3">{photo.title}</figcaption>
+                </figure>
+            ))}
+        </div>
+    </section>
+</MainGridLayout>
+
+<style>
+    .album-grid {
+        display: grid;
+        gap: 1.5rem;
+    }
+    .album-photo {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+    }
+    .photo-link {
+        flex: 1;
+        min-height: 0;
+        cursor: zoom-in;
+    }
+    @media (min-width: 640px) {
+        .album-grid {
+            grid-template-columns: 1.1fr 1fr;
+        }
+        .album-photo:first-child {
+            grid-row: span 2;
+        }
+    }
+</style>

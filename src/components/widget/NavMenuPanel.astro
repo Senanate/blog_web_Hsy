@@ -30,3 +30,10 @@ const links = Astro.props.links;
         </a>
     ))}
 </div>
+
+<script>
+const navMenuPanel = document.getElementById("nav-menu-panel");
+navMenuPanel?.addEventListener("click", () => {
+	navMenuPanel.classList.add("float-panel-closed");
+});
+</script>

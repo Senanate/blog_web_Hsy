@@ -9,7 +9,7 @@ import { LinkPreset } from "./types/config";
 
 export const siteConfig: SiteConfig = {
 	title: "SunnyHuang 的博客",
-	subtitle: "分享技术实践、学习笔记与生活思考",
+	subtitle: "记录嵌入式开发、AI 学习与旅行日常",
 	lang: "zh_CN", // Language code, e.g. 'en', 'zh_CN', 'ja', etc.
 	themeColor: {
 		hue: 250, // Default hue for the theme color, from 0 to 360. e.g. red: 0, teal: 200, cyan: 250, pink: 345
@@ -44,6 +44,7 @@ export const navBarConfig: NavBarConfig = {
 	links: [
 		LinkPreset.Home,
 		LinkPreset.Archive,
+		{ name: "相册", url: "/albums/" },
 		LinkPreset.About,
 		{
 			name: "GitHub",
@@ -56,7 +57,7 @@ export const navBarConfig: NavBarConfig = {
 export const profileConfig: ProfileConfig = {
 	avatar: "/avatar.jpg",
 	name: "SunnyHuang",
-	bio: "我是 SunnyHuang，在这里分享项目实践、博客搭建经验和学习笔记，也记录生活中的想法。",
+	bio: "上海海事大学电子信息专业大四学生，已推免至华东理工大学控制工程专硕。擅长嵌入式开发，正在学习用 AI 搭建网站。",
 	links: [
 		{
 			name: "GitHub",
