@@ -16,13 +16,14 @@ export const siteConfig: SiteConfig = {
 		fixed: false, // Hide the theme color picker for visitors
 	},
 	banner: {
-		enable: false,
-		src: "assets/images/demo-banner.png", // Relative to the /src directory. Relative to the /public directory if it starts with '/'
-		position: "center", // Equivalent to object-position, only supports 'top', 'center', 'bottom'. 'center' by default
+		enable: true,
+		src: "/wallpapers/soured-apple-clouds.webp", // 动态壁纸的静态封面
+		videoSrc: "/wallpapers/soured-apple-clouds.mp4", // 相对于 public 目录的路径
+		position: "top",
 		credit: {
-			enable: false, // Display the credit text of the banner image
-			text: "", // Credit text to be displayed
-			url: "", // (Optional) URL link to the original artwork or artist's page
+			enable: true,
+			text: "SouredAppleClouds",
+			url: "https://steamcommunity.com/sharedfiles/filedetails/?id=1948961570",
 		},
 	},
 	toc: {

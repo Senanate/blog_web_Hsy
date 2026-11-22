@@ -13,6 +13,7 @@ import {
 	BANNER_HEIGHT_EXTEND,
 	MAIN_PANEL_OVERLAPS_BANNER_HEIGHT,
 } from "../constants/constants";
+import { url } from "../utils/url-utils";
 import Layout from "./Layout.astro";
 
 interface Props {
@@ -35,9 +36,16 @@ const {
 const hasBannerCredit =
 	siteConfig.banner.enable && siteConfig.banner.credit.enable;
 const hasBannerLink = !!siteConfig.banner.credit.url;
+const bannerVideoSrc = siteConfig.banner.enable && siteConfig.banner.videoSrc
+	? url(siteConfig.banner.videoSrc)
+	: undefined;
+const bannerPosition = `var(--wallpaper-position, ${siteConfig.banner.position ?? "center"})`;
+const wallpaperPoster = bannerVideoSrc && siteConfig.banner.src.startsWith("/")
+	? `url(${JSON.stringify(url(siteConfig.banner.src))})`
+	: "none";
 
 const mainPanelTop = siteConfig.banner.enable
-	? `calc(${BANNER_HEIGHT}vh - ${MAIN_PANEL_OVERLAPS_BANNER_HEIGHT}rem)`
+	? `max(${bannerVideoSrc ? "8.5rem" : "0px"}, ${BANNER_HEIGHT}vh - ${MAIN_PANEL_OVERLAPS_BANNER_HEIGHT}rem)`
 	: "5.5rem";
 ---
 
@@ -52,32 +60,46 @@ const mainPanelTop = siteConfig.banner.enable
 </div>
 
 <!-- Banner -->
-{siteConfig.banner.enable && <div id="banner-wrapper" class={`absolute z-10 w-full transition duration-700 overflow-hidden`} style={`top: -${BANNER_HEIGHT_EXTEND}vh`}>
-    <ImageWrapper id="banner" alt="Banner image of the blog" class:list={["object-cover h-full transition duration-700 opacity-0 scale-105"]}
-                  src={siteConfig.banner.src} position={siteConfig.banner.position}
-    >
-    </ImageWrapper>
+{siteConfig.banner.enable && <div id="banner-wrapper" class="absolute z-10 w-full transition duration-700 overflow-hidden"
+    style={`--banner-top: -${BANNER_HEIGHT_EXTEND}vh; --wallpaper-poster: ${wallpaperPoster}`}>
+    <div id="banner" class:list={[
+        "relative h-full overflow-hidden transition-[transform,opacity,translate] duration-700 motion-reduce:opacity-100 motion-reduce:scale-100 motion-reduce:transition-none",
+        { "wallpaper-frame": bannerVideoSrc, "opacity-0 scale-105": !bannerVideoSrc },
+    ]}>
+        <ImageWrapper src={siteConfig.banner.src} position={bannerPosition} class="h-full" alt="" />
+        {bannerVideoSrc && <video id="banner-video" data-src={bannerVideoSrc} aria-hidden="true"
+            class="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-300 dark:brightness-90 motion-reduce:hidden"
+            style={`object-position: ${bannerPosition}`}
+            loop muted playsinline preload="none"></video>}
+    </div>
 </div>}
 
 <!-- Main content -->
-<div class="absolute w-full z-30 pointer-events-none" style={`top: ${mainPanelTop}`}>
+<div id="main-panel" tabindex="-1" class="absolute w-full z-30 pointer-events-none" style={`--main-panel-top: ${mainPanelTop}`}>
     <!-- The pointer-events-none here prevent blocking the click event of the TOC -->
     <div class="relative max-w-[var(--page-width)] mx-auto pointer-events-auto">
         <div id="main-grid" class="transition duration-700 w-full left-0 right-0 grid grid-cols-[17.5rem_auto] grid-rows-[auto_1fr_auto] lg:grid-rows-[auto]
     mx-auto gap-4 px-0 md:px-4"
         >
-            <!-- Banner image credit -->
-            {hasBannerCredit && <a href={siteConfig.banner.credit.url} id="banner-credit" target="_blank" rel="noopener" aria-label="Visit image source"
-                                   class:list={["group onload-animation transition-all absolute flex justify-center items-center rounded-full " +
-                                   "px-3 right-4 -top-[3.25rem] bg-black/60 hover:bg-black/70 h-9", {"hover:pr-9 active:bg-black/80": hasBannerLink}]}
-            >
-                <Icon class="text-white/75 text-[1.25rem] mr-1" name="material-symbols:copyright-outline-rounded" ></Icon>
-                <div class="text-white/75 text-xs">{siteConfig.banner.credit.text}</div>
-                <Icon class:list={["transition absolute text-[oklch(0.75_0.14_var(--hue))] right-4 text-[0.75rem] opacity-0",
-                    {"group-hover:opacity-100": hasBannerLink}]}
-                      name="fa6-solid:arrow-up-right-from-square">
-                </Icon>
-            </a>}
+            {(bannerVideoSrc || hasBannerCredit) && <div id="banner-actions" class="absolute left-4 right-4 -top-[3.5rem] flex items-center gap-2 lg:left-auto">
+                {bannerVideoSrc && <div id="wallpaper-intro" class="hidden flex-col items-center gap-2">
+                    <h1 class="whitespace-nowrap text-2xl font-bold leading-tight text-white md:text-4xl">Hsy的个人博客</h1>
+                    <a id="wallpaper-scroll" href="#main-panel" data-no-swup
+                        class="inline-flex min-h-[44px] items-center gap-2 whitespace-nowrap rounded-full bg-black/75 px-4 text-sm text-white transition-colors hover:bg-black/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white">
+                        向下浏览<span aria-hidden="true" class="mb-1 h-2 w-2 rotate-45 border-b border-r border-current"></span>
+                    </a>
+                </div>}
+                {bannerVideoSrc && <button id="banner-video-toggle" type="button" aria-controls="banner-video" hidden
+                    class="min-h-[44px] rounded-full bg-black/75 px-3 text-xs text-white transition-colors hover:bg-black/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white motion-reduce:hidden">播放动态</button>}
+                {hasBannerCredit && <a href={siteConfig.banner.credit.url} id="banner-credit" target="_blank" rel="noopener" aria-label="查看壁纸来源"
+                    class:list={["group onload-animation ml-auto flex min-h-[44px] items-center rounded-full bg-black/75 px-3 text-xs text-white transition-colors hover:bg-black/90 motion-reduce:animate-none motion-reduce:opacity-100",
+                        {"active:bg-black/80": hasBannerLink}]}>
+                    <Icon class="mr-1 text-[1.25rem]" name="material-symbols:copyright-outline-rounded" />
+                    {siteConfig.banner.credit.text}
+                    {hasBannerLink && <Icon class="ml-1 text-[0.75rem] opacity-60 transition-opacity group-hover:opacity-100"
+                        name="fa6-solid:arrow-up-right-from-square" />}
+                </a>}
+            </div>}
 
 
             <SideBar class="mb-4 row-start-2 row-end-3 col-span-2 lg:row-start-1 lg:row-end-2 lg:col-span-1 lg:max-w-[17.5rem] onload-animation" headings={headings}></SideBar>
@@ -123,3 +145,203 @@ const mainPanelTop = siteConfig.banner.enable
     </div>
 </div>
 </Layout>
+
+<style>
+#banner-wrapper {
+	top: var(--banner-top);
+}
+
+#main-panel {
+	top: var(--main-panel-top);
+}
+
+/* 短横幅向上收一点，让星芒和云层亮部同时留在可见区域。 */
+.wallpaper-frame {
+	translate: 0 -6.5vh;
+}
+
+@media (min-width: 1024px) {
+	.wallpaper-frame {
+		translate: 0 -11vh;
+	}
+}
+
+:global(body.wallpaper-hero) {
+	--wallpaper-hero-height: 100vh;
+	--wallpaper-actions-space: 8rem;
+	--wallpaper-toolbar-space: 0rem;
+}
+
+/* Astro 的本地调试栏在首屏底部保留了透明的点击区域。 */
+:global(body.wallpaper-hero:has(astro-dev-toolbar)) {
+	--wallpaper-toolbar-space: 3rem;
+}
+
+@supports (height: 100svh) {
+	:global(body.wallpaper-hero) {
+		--wallpaper-hero-height: 100svh;
+	}
+}
+
+:global(body.wallpaper-hero) #top-row,
+:global(body.wallpaper-hero) #banner-wrapper {
+	height: var(--wallpaper-hero-height);
+}
+
+:global(body.wallpaper-hero) #top-row {
+	transition: none;
+}
+
+:global(body.wallpaper-hero) #navbar-wrapper {
+	position: relative;
+}
+
+:global(body.wallpaper-hero) #banner-wrapper {
+	top: 0;
+	background: #081429;
+}
+
+/* 原始比例的壁纸完整保留，横竖屏的留白用静态封面延展。 */
+:global(body.wallpaper-hero) #banner-wrapper::before {
+	content: "";
+	position: absolute;
+	inset: -2.5rem;
+	background: var(--wallpaper-poster) center / cover;
+	filter: blur(2rem) brightness(0.48);
+}
+
+:global(body.wallpaper-hero) #banner {
+	--wallpaper-position: center;
+	position: absolute;
+	inset: 4.5rem 0 calc(var(--wallpaper-actions-space) + var(--wallpaper-toolbar-space));
+	height: auto;
+	transform: none;
+	translate: none;
+}
+
+:global(body.wallpaper-hero) #banner :global(img),
+:global(body.wallpaper-hero) #banner video {
+	object-fit: contain;
+}
+
+:global(body.wallpaper-hero) #main-panel {
+	position: relative;
+	top: auto;
+	padding-top: 1rem;
+}
+
+:global(body.wallpaper-hero) #banner-actions {
+	top: auto;
+	bottom: calc(100% + 2rem + var(--wallpaper-toolbar-space));
+	left: 1rem;
+	display: grid;
+	grid-template-columns: 1fr auto 1fr;
+	align-items: end;
+}
+
+:global(body.wallpaper-hero) #wallpaper-intro {
+	display: flex;
+	grid-column: 2;
+	grid-row: 1;
+	justify-self: center;
+}
+
+:global(body.wallpaper-hero) #banner-video-toggle {
+	grid-column: 1;
+	grid-row: 1;
+	justify-self: start;
+}
+
+:global(body.wallpaper-hero) #banner-credit {
+	grid-column: 3;
+	grid-row: 1;
+	animation: none;
+	opacity: 1;
+}
+
+@media (max-width: 639px) {
+	:global(body.wallpaper-hero) {
+		--wallpaper-actions-space: 10.75rem;
+	}
+
+	:global(body.wallpaper-hero) #banner-actions {
+		grid-template-columns: auto 1fr;
+	}
+
+	:global(body.wallpaper-hero) #wallpaper-intro {
+		grid-column: 1 / -1;
+	}
+
+	:global(body.wallpaper-hero) #banner-video-toggle,
+	:global(body.wallpaper-hero) #banner-credit {
+		grid-row: 2;
+	}
+
+	:global(body.wallpaper-hero) #banner-credit {
+		grid-column: 2;
+	}
+}
+</style>
+
+<script>
+const scrollLink = document.getElementById("wallpaper-scroll");
+const mainPanel = document.getElementById("main-panel");
+scrollLink?.addEventListener("click", (event) => {
+	if (!mainPanel || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+	event.preventDefault();
+	mainPanel.focus({ preventScroll: true });
+	mainPanel.scrollIntoView({
+		behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth",
+	});
+});
+
+const banner = document.getElementById("banner");
+const video = document.querySelector<HTMLVideoElement>("#banner-video");
+const toggle = document.querySelector<HTMLButtonElement>("#banner-video-toggle");
+const source = video?.dataset.src;
+
+if (banner && video && toggle && source) {
+	const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+	let inView = false;
+	let pausedByVisitor = false;
+
+	const updateLabel = () => {
+		toggle.textContent = pausedByVisitor ? "播放动态" : "暂停动态";
+	};
+
+	const updatePlayback = () => {
+		if (reducedMotion.matches || pausedByVisitor || !inView || document.hidden) {
+			video.pause();
+			return;
+		}
+
+		// 横幅可见且允许动态效果后再设置源，减少不必要的视频下载。
+		if (!video.hasAttribute("src")) video.src = source;
+		void video.play().catch((error: unknown) => {
+			if (error instanceof DOMException && error.name === "NotAllowedError") {
+				pausedByVisitor = true;
+				updateLabel();
+			}
+		});
+	};
+
+	toggle.addEventListener("click", () => {
+		pausedByVisitor = !pausedByVisitor;
+		updateLabel();
+		updatePlayback();
+	});
+	video.addEventListener("playing", () => video.classList.remove("opacity-0"));
+	video.addEventListener("error", () => {
+		video.classList.add("opacity-0");
+		toggle.hidden = true;
+	});
+	reducedMotion.addEventListener("change", updatePlayback);
+	document.addEventListener("visibilitychange", updatePlayback);
+	new IntersectionObserver(([entry]) => {
+		inView = entry.isIntersecting;
+		updatePlayback();
+	}).observe(banner);
+	updateLabel();
+	toggle.hidden = false;
+}
+</script>
