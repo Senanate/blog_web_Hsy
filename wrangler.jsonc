@@ -1,9 +1,19 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "blog-web-hsy",
+  "main": "workers/comments.js",
   "compatibility_date": "2026-11-19",
   "assets": {
+    "binding": "ASSETS",
     "directory": "./dist",
-    "not_found_handling": "404-page"
-  }
+    "not_found_handling": "404-page",
+    "run_worker_first": ["/api/comments"]
+  },
+  "durable_objects": {
+    "bindings": [{ "name": "POST_COMMENTS", "class_name": "PostComments" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["PostComments"] }],
+  "ratelimits": [
+    { "name": "COMMENT_POST_LIMIT", "namespace_id": "1001", "simple": { "limit": 5, "period": 60 } }
+  ]
 }

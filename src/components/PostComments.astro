@@ -1,0 +1,43 @@
+---
+import I18nKey from "@i18n/i18nKey";
+import { i18n } from "@i18n/translation";
+
+interface Props {
+	slug: string;
+}
+
+const { slug } = Astro.props;
+const inputClass = "block w-full rounded-xl border border-black/15 bg-[var(--page-bg)] px-3 py-2.5 text-base outline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--primary)] dark:border-white/20";
+---
+
+<section id="comments" class="card-base mb-4 px-6 py-6 md:px-9" aria-labelledby="comments-heading">
+    <h2 id="comments-heading" class="mb-3 text-xl font-bold text-black/90 dark:text-white/90">{i18n(I18nKey.comments)}</h2>
+    <blog-comments class="block" data-url={`/api/comments?${new URLSearchParams({ post: slug })}`}>
+        <p class="text-sm text-black/65 dark:text-white/70" data-list-status role="status"></p>
+        <ol class="divide-y divide-[var(--line-divider)]" data-comment-list></ol>
+        <template>
+            <li class="min-w-0 py-4">
+                <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                    <strong class="min-w-0 break-words text-black/90 dark:text-white/90"></strong>
+                    <time class="text-sm text-black/60 dark:text-white/65"></time>
+                </div>
+                <p class="mt-1 whitespace-pre-wrap break-words text-black/80 dark:text-white/85"></p>
+            </li>
+        </template>
+        <form class="mt-5 grid gap-4 border-t border-[var(--line-divider)] pt-5 text-black/90 dark:text-white/90">
+            <label class="block max-w-xs text-sm font-medium">
+                <span class="mb-1.5 block">昵称</span>
+                <input class={inputClass} name="name" required maxlength="32" autocomplete="nickname" />
+            </label>
+            <label class="block text-sm font-medium">
+                <span class="mb-1.5 block">评论内容</span>
+                <textarea class={inputClass} name="message" rows="4" required maxlength="1000"></textarea>
+            </label>
+            <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
+                <button class="btn-regular min-h-11 rounded-xl px-4 font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-60" type="submit" disabled>发表评论</button>
+                <p class="text-sm text-black/70 dark:text-white/75" data-form-status role="status"></p>
+            </div>
+        </form>
+        <noscript><p class="mt-3 text-sm">请启用 JavaScript 查看和发表评论。</p></noscript>
+    </blog-comments>
+</section>
