@@ -7,7 +7,8 @@ interface Props {
 }
 
 const { slug } = Astro.props;
-const inputClass = "block w-full rounded-xl border border-black/15 bg-[var(--page-bg)] px-3 py-2.5 text-base outline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--primary)] dark:border-white/20";
+const inputClass =
+	"block w-full rounded-xl border border-black/15 bg-[var(--page-bg)] px-3 py-2.5 text-base outline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--primary)] dark:border-white/20";
 ---
 
 <section id="comments" class="card-base mb-4 px-6 py-6 md:px-9" aria-labelledby="comments-heading">
@@ -41,3 +42,7 @@ const inputClass = "block w-full rounded-xl border border-black/15 bg-[var(--pag
         <noscript><p class="mt-3 text-sm">请启用 JavaScript 查看和发表评论。</p></noscript>
     </blog-comments>
 </section>
+
+<script>
+import "../scripts/post-comments";
+</script>
